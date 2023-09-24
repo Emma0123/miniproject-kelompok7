@@ -29,6 +29,14 @@
     
             return rupiah + ribuan;
         }   
+      
+// Menambah data, yang perlu disimpan :
+//     - id
+//     - type : income / expence
+//     - nominal
+//     - note
+//     - date (format : “yyyy-mm-dd”)
+      
         // Fungsi untuk menambahkan data keuangan
         function tambahData() {
             // Meminta input ID dari user
@@ -84,6 +92,9 @@
         }
 
 
+// Menampilkan data pengeluaran dan pemasukan dan menampilkan sisa uang terakhir
+// Menampilkan data berdasarkan rentang tanggal mulai dan akhir yang diberikan
+      
         // Fungsi untuk menampilkan data keuangan sesuai dengan filter yang di inputkan user
         function tampilkanData() {
             //Jika user ga menginputkan data sama sekali
@@ -130,7 +141,130 @@
                 alert(`Uang sekarang: ${formatRupiah(saldoFilter)}`);
             }
         
+        }// Memperbarui data, yang bisa diperbarui :
+//     - nominal
+//     - note
+//     - date
+
+// Fungsi untuk memperbarui data keuangan
+function perbaruiData() {
+    // Meminta input ID data yang akan diperbarui
+    const idToUpdate = prompt("Masukkan ID data yang akan diperbarui:");
+
+    // Menggunakan filter untuk mendapatkan data yang memiliki ID yang sesuai dengan inputan user
+    const filteredData = data.filter(item => {
+        return item.id === idToUpdate;
+    });
+
+    if (filteredData.length === 0) {
+        alert("Tidak ada data yang sesuai dengan kriteria yang dimasukkan.");
+        return;
+    }
+
+    let dataToDisplay = "Data yang cocok dengan kriteria Anda:\n";
+
+    for (let i = 0; i < filteredData.length; i++) {
+        const item = filteredData[i];
+        dataToDisplay += `${i + 1}. ID: ${item.id}, Type: ${item.type}, Nominal: ${formatRupiah(item.nominal)}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+    }
+    alert(dataToDisplay);
+
+    // Meminta nomor data yang ingin diperbarui
+    dataToDisplay = "Pilih data yang ingin diperbarui:\n";
+    for (let i = 0; i < filteredData.length; i++) {
+        const item = filteredData[i];
+        dataToDisplay += `${i + 1}. ID: ${item.id}, Type: ${item.type}, Nominal: ${formatRupiah(item.nominal)}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+    }
+    dataToDisplay += "\nMasukkan nomor data yang ingin diperbarui:";
+    const dataToUpdateIndex = parseInt(prompt(dataToDisplay)) - 1;
+
+    // Jika nomor data yang di inputkan user tidak valid 
+    if (isNaN(dataToUpdateIndex) || dataToUpdateIndex < 0 || dataToUpdateIndex >= filteredData.length) {
+        alert("Nomor data yang dimasukkan tidak valid.");
+        return;
+    }
+
+    // Mengambil elemen dari array 'filteredData' berdasarkan indeks yang dipilih oleh pengguna.
+    // 'dataToUpdateIndex' adalah indeks yang merepresentasikan elemen yang akan diubah.
+    const itemToUpdate = filteredData[dataToUpdateIndex];
+
+    // Meminta input ID, tanggal, nominal, dan catatan baru
+    const newId = prompt(`ID baru (${itemToUpdate.id}):`) || itemToUpdate.id;
+    const newDate = prompt(`Tanggal baru (${itemToUpdate.date}):`) || itemToUpdate.date;
+    const newNominal = parseFloat(prompt(`Nominal baru (${formatRupiah(itemToUpdate.nominal)})\n *Inputkan angka saja`)) || itemToUpdate.nominal;
+    const newNote = prompt(`Catatan baru (${itemToUpdate.note}):`) || itemToUpdate.note;
+
+    // Mengupdate saldo sesuai dengan perubahan
+    if (itemToUpdate.type === "Income") {
+        saldo -= itemToUpdate.nominal;
+        saldo += newNominal;
+    } else {
+        saldo += itemToUpdate.nominal;
+        saldo -= newNominal;
+    }
+
+    // Mengupdate data dengan nilai yang baru
+    itemToUpdate.id = newId;
+    itemToUpdate.date = newDate;
+    itemToUpdate.nominal = newNominal;
+    itemToUpdate.note = newNote;
+
+    alert("Data berhasil diperbarui.");
+}
+
+
+// Menghapus data yang dipilih
+
+// Fungsi untuk menghapus data keuangan
+function hapusData() {
+        // Meminta input ID data yang akan dihapus
+        const idToDelete = prompt("Masukkan ID data yang akan dihapus:");
+
+        // Menggunakan filter untuk mendapatkan data dengan ID yang sesuai
+        const filteredData = data.filter(item => {
+            return item.id === idToDelete;
+        });
+
+        if (filteredData.length === 0) {
+            alert("Tidak ada data dengan ID yang sesuai.");
+            return;
         }
+
+        let dataToDisplay = "Data dengan ID yang sesuai:\n";
+        for (let i = 0; i < filteredData.length; i++) {
+            const item = filteredData[i];
+
+            dataToDisplay += `${i + 1}. ID: ${item.id}, Type: ${item.type}, Nominal: ${formatRupiah(item.nominal)}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+        }
+
+        alert(dataToDisplay);
+
+        // User memilih data mana yang ingin dihapus
+        dataToDisplay = "Masukkan nomor data yang ingin dihapus:\n";
+        for (let i = 0; i < filteredData.length; i++) {
+        const item = filteredData[i];
+        dataToDisplay += `${i + 1}. ID: ${item.id}, Type: ${item.type}, Nominal: ${formatRupiah(item.nominal)}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+    }
+
+        const dataToDeleteIndex = parseInt(prompt(dataToDisplay)) - 1;
+
+        if (isNaN(dataToDeleteIndex) || dataToDeleteIndex < 0 || dataToDeleteIndex >= filteredData.length) {
+            alert("Nomor data yang dimasukkan tidak valid.");
+            return;
+        }
+
+        // Menghapus data yang dipilih oleh user
+        const deletedItem = data.splice(data.indexOf(filteredData[dataToDeleteIndex]), 1)[0];
+
+        // Mengupdate saldo sesuai dengan data yang dihapus oleh user
+        if (deletedItem.type === "Income") {
+            saldo -= deletedItem.nominal;
+        } else {
+            saldo += deletedItem.nominal;
+        }
+
+        alert("Data berhasil dihapus.");
+    }
 </script>
 </body>
 </html>
