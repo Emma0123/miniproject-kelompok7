@@ -1,30 +1,147 @@
 <!DOCTYPE html>
 <html>
 <head>
-    Aplikasi Keuangan
+    <title>Aplikasi Keuangan</title>
 </head>
 <body>
-  <h1> Aplikasi Keuangan</h1>
-  <button onclick="tambahData()">Tambah Data</button>
-  <button onclick="tampilkanData()">Tampilkan Data</button>
-  <button onclick="perbaruiData()">Perbarui Data</button>
-  <button onclick="hapusData()">Hapus Data</button>
-  
-<script>
-  //Diatas ada button yang dibuat untuk memanggil fungsi fungsi yang ada dibawah
+    <h1>Aplikasi Keuangan</h1>
+    <button onclick="tambahData()">Tambah Data</button>
+    <button onclick="tampilkanData()">Tampilkan Data</button>
+    <button onclick="perbaruiData()">Perbarui Data</button>
+    <button onclick="hapusData()">Hapus Data</button>
+    <button onclick="tampilkanSaldo()">Tampilkan Saldo</button>
 
+    <script>
+        const data = [];
+        let saldo = 0;
+         // Fungsi untuk mengubah angka menjadi format rupiah
+         function formatRupiah(angka) {
+            let rupiah = "Rp ";
+            angka = angka.toString();
+            let ribuan = "";
+    
+            for (let i = angka.length - 1; i >= 0; i--) {
+                ribuan = angka[i] + ribuan;
+                if ((angka.length - i) % 3 === 0 && i !== 0) {
+                    ribuan = "." + ribuan;
+                }
+            }
+    
+            return rupiah + ribuan;
+        }   
+      
 // Menambah data, yang perlu disimpan :
 //     - id
 //     - type : income / expence
 //     - nominal
 //     - note
 //     - date (format : “yyyy-mm-dd”)
+      
+        // Fungsi untuk menambahkan data keuangan
+        function tambahData() {
+            // Meminta input ID dari user
+            const id = prompt("Masukkan ID:");
+            if (!id) {
+                alert("ID tidak boleh kosong. Data tidak akan ditambahkan.");
+                return;
+            }
+
+            // Meminta input tipe (Income/Expense) dari user
+            const typeInput = prompt("Pilih tipe :\n1. Income\n2. Expense");
+            let type;
+            if (typeInput === "1") {
+                type = "Income";
+            }
+            else if(typeInput === "2"){
+                type = "Expense";
+            }
+            else{
+                alert("Input yang anda masukkan tidak valid. Data tidak ditambahkan");
+                return;
+            }
+
+            // Meminta input nominal dari user
+            //Pake parseFloat karena uang tidak desimal
+            const nominal = parseFloat(prompt("Nominal (inputkan angka saja):"));
+            const note = prompt("Catatan:");
+            const date = prompt("Tanggal (format yyyy-mm-dd):");
+
+            //Klo user ga menginputkan angka
+            if (isNaN(nominal)) {
+                alert("Nominal harus berupa angka. Data tidak akan ditambahkan.");
+                return;
+            }
+
+            // Menambahkan data baru ke dalam array data yang ada di atas 
+            data.push({
+                id,
+                type,
+                nominal,
+                note,
+                date,
+            });
+
+            // Mengupdate saldo sesuai dengan tipe data (Income/Expense)
+            if (type === "Income") {
+                saldo += nominal;
+            } else {
+                saldo -= nominal;
+            }
+
+            alert("Data berhasil ditambahkan.");
+        }
+
 
 // Menampilkan data pengeluaran dan pemasukan dan menampilkan sisa uang terakhir
-
 // Menampilkan data berdasarkan rentang tanggal mulai dan akhir yang diberikan
+      
+        // Fungsi untuk menampilkan data keuangan sesuai dengan filter yang di inputkan user
+        function tampilkanData() {
+            //Jika user ga menginputkan data sama sekali
+            if (data.length === 0) {
+                alert("Belum ada data yang ditambahkan.");
+                return;
+            }
 
-// Memperbarui data, yang bisa diperbarui :
+            // Meminta input ID dan filter tanggal dari user
+            const filterID = prompt("Masukkan ID (kosongkan jika tidak ingin memfilter):");
+            const filterInput = prompt("Masukkan filter (yyyy-mm-dd, yyyy-mm, atau yyyy) untuk menampilkan data");
+
+            let dataToDisplay = "Data Pengeluaran dan Pemasukan:\n";
+            let saldoFilter = 0;
+
+            // Melakukan pengecheck-an pada data yang sudah disimpan dengan filter yang di inputkan user
+            for (const item of data) {
+                //Memeriksa apakah user menginputkan ID atau tidak, jika tidak maka tidak akan difilter berdasarkan ID
+                if ((filterID === "" 
+                    // Memfilter data berdasarkan ID yang di inputkan user
+                || item.id === filterID)
+                    //Memeriksa tahun, bulan, dan tanggal yang di inputkan oleh user, jika user hanya menginputkan tahunnya saja atau tahun dan bulannya saja
+                && (item.date.startsWith(filterInput) 
+                    //Memeriksa tahun-bulan-tanggal yang di inputkan user sesuai tidak dengan data yang sudah tersimpan sebelumnya
+                || item.date.includes(`-${filterInput}-`))) {
+                    //Menampilkan data yang sesuai
+                    dataToDisplay += `ID: ${item.id}, Type: ${item.type}, Nominal: ${formatRupiah(item.nominal)}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+
+                    // Mengupdate saldo sesuai dengan tipe data (Income/Expense)
+                    if (item.type === "Income") {
+                        saldoFilter += item.nominal;
+                    } else {
+                        saldoFilter -= item.nominal;
+                    }
+                }
+            }
+
+            // Jika input an user tidak sesuai dengan data yang sudah ada (variabel dataToDisplay masih memiliki nilai yang sama, artinya input an user tidak sesuai dengan data yang sudah ada)
+            if (dataToDisplay === "Data Pengeluaran dan Pemasukan:\n") {
+                alert(`Tidak ada data yang sesuai dengan filter: ${filterInput}`);
+            } else {
+                //Jika data yang di inputkan user sesuai dengan data yang sudah ada maka akan ditampilkan 
+                alert(dataToDisplay);
+                alert(`Uang sekarang: ${formatRupiah(saldoFilter)}`);
+            }
+        
+        }// Memperbarui data, yang bisa diperbarui :
 //     - nominal
 //     - note
 //     - date
@@ -148,9 +265,6 @@ function hapusData() {
 
         alert("Data berhasil dihapus.");
     }
-
 </script>
-
 </body>
-
 </html>
