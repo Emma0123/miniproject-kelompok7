@@ -1,3 +1,71 @@
-<script>
-    const addMoney = 2500000;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aplikasi Keuangan</title>
+</head>
+<body>
+    <h1>Aplikasi Keuangan</h1>
+    <button onclick="tambahData()">Tambah Data</button>
+    <button onclick="tampilkanData()">Tampilkan Data</button>
+    <button onclick="perbaruiData()">Perbarui Data</button>
+    <button onclick="hapusData()">Hapus Data</button>
+    <button onclick="tampilkanSaldo()">Tampilkan Saldo</button>
+
+    <script>
+        const data = [];
+        let saldo = 0;
+
+        function tambahData() {
+            const id = prompt("Masukkan ID:");
+            if (!id) {
+                alert("ID tidak boleh kosong. Data tidak akan ditambahkan.");
+                return;
+            }
+
+            const type = prompt("Tipe (income/expence):");
+            const nominal = parseFloat(prompt("Nominal:"));
+            const note = prompt("Catatan:");
+            const date = prompt("Tanggal (format yyyy-mm-dd):");
+
+            if (type !== "income" && type !== "expence") {
+                alert("Tipe harus income atau expence. Data tidak akan ditambahkan.");
+                return;
+            }
+
+            if (isNaN(nominal)) {
+                alert("Nominal harus berupa angka. Data tidak akan ditambahkan.");
+                return;
+            }
+
+            data.push({
+                id,
+                type,
+                nominal,
+                note,
+                date,
+            });
+
+            if (type === "income") {
+                saldo += nominal;
+            } else {
+                saldo -= nominal;
+            }
+
+            alert("Data berhasil ditambahkan.");
+        }
+        function tampilkanData() {
+            if (data.length === 0) {
+                alert("Belum ada data yang ditambahkan.");
+                return;
+            }
+
+            let dataToDisplay = "Data Pengeluaran dan Pemasukan:\n";
+            for (const item of data) {
+                dataToDisplay += `ID: ${item.id}, Type: ${item.type}, Nominal: ${item.nominal}, Catatan: ${item.note}, Tanggal: ${item.date}\n`;
+            }
+
+            alert(dataToDisplay);
+        }
 </script>
+</body>
+</html>
